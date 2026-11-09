@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Библиотека — Управление</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Login screen (hidden when authenticated) -->
+  <div id="login-screen" class="login-screen hidden">
+    <div class="login-card">
+      <div class="login-logo">📚</div>
+      <h1>Библиотека</h1>
+      <p class="login-subtitle">Вход для библиотекаря</p>
+      <form id="login-form" class="login-form">
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" required autocomplete="username" placeholder="email@example.com" />
+        </div>
+        <div class="form-group">
+          <label for="login-password">Пароль</label>
+          <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••" />
+        </div>
+        <div id="login-error" class="login-error hidden"></div>
+        <button type="submit" class="btn btn-primary login-btn" id="login-submit">Войти</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main app (hidden until authenticated) -->
+  <div id="app" class="hidden">
+    <!-- Mobile top bar with hamburger -->
+    <div class="mobile-topbar">
+      <button class="hamburger" id="btn-hamburger" aria-label="Меню">☰</button>
+      <div class="mobile-topbar-title">📚 Библиотека</div>
+      <button class="mobile-logout" id="btn-logout-mobile" aria-label="Выйти">↩</button>
+    </div>
+
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">📚</div>
+        <h1>Библиотека</h1>
+      </div>
+      <nav class="nav">
+        <button class="nav-item active" data-view="dashboard">
+          <span class="nav-icon">📊</span> Обзор
+        </button>
+        <button class="nav-item" data-view="books">
+          <span class="nav-icon">📖</span> Книги
+        </button>
+        <button class="nav-item" data-view="copies">
+          <span class="nav-icon">🔖</span> Экземпляры
+        </button>
+        <button class="nav-item" data-view="students">
+          <span class="nav-icon">👨‍🎓</span> Ученики
+        </button>
+        <button class="nav-item" data-view="checkouts">
+          <span class="nav-icon">🔄</span> Выдачи
+        </button>
+      </nav>
+      <div class="sidebar-user">
+        <div class="user-info">
+          <div class="user-avatar" id="user-avatar">👤</div>
+          <div class="user-meta">
+            <div class="user-name" id="user-name">—</div>
+            <div class="user-role" id="user-role">библиотекарь</div>
+          </div>
+        </div>
+        <button class="btn-logout" id="btn-logout" title="Выйти">↩</button>
+      </div>
+      <div class="sidebar-footer">
+        <div id="conn-status" class="conn-status">
+          <span class="dot"></span> <span id="conn-text">Подключение...</span>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <!-- Dashboard -->
+      <section id="view-dashboard" class="view active">
+        <h2>Обзор</h2>
+        <div class="stats-grid" id="stats-grid"></div>
+        <div class="dashboard-cards">
+          <div class="card">
+            <h3>📚 Книги</h3>
+            <div id="dash-books" class="card-content"></div>
+          </div>
+          <div class="card">
+            <h3>🔄 Активные выдачи</h3>
+            <div id="dash-checkouts" class="card-content"></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Books -->
+      <section id="view-books" class="view">
+        <div class="view-header">
+          <h2>Книги</h2>
+          <button class="btn btn-primary" id="btn-add-book">+ Добавить книгу</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="book-search" placeholder="Поиск по названию или автору..." />
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Название</th>
+                <th>Автор</th>
+                <th>Класс</th>
+                <th>ISBN</th>
+                <th>Экз.</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="books-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Copies -->
+      <section id="view-copies" class="view">
+        <div class="view-header">
+          <h2>Экземпляры</h2>
+          <button class="btn btn-primary" id="btn-add-copy">+ Добавить экземпляр</button>
+        </div>
+        <div class="filter-bar">
+          <select id="copy-status-filter">
+            <option value="">Все статусы</option>
+            <option value="available">Доступен</option>
+            <option value="issued">Выдан</option>
+            <option value="lost">Утерян</option>
+            <option value="damaged">Повреждён</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Книга</th>
+                <th>QR-код</th>
+                <th>Статус</th>
+                <th>Дата поступления</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="copies-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Students -->
+      <section id="view-students" class="view">
+        <div class="view-header">
+          <h2>Ученики</h2>
+          <button class="btn btn-primary" id="btn-add-student">+ Добавить ученика</button>
+        </div>
+        <div class="search-bar">
+          <input type="text" id="student-search" placeholder="Поиск по имени или классу..." />
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>ФИО</th>
+                <th>Класс</th>
+                <th>QR-код</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="students-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- Checkouts -->
+      <section id="view-checkouts" class="view">
+        <div class="view-header">
+          <h2>Выдачи</h2>
+          <button class="btn btn-primary" id="btn-new-checkout">+ Новая выдача</button>
+        </div>
+        <div class="filter-bar">
+          <select id="checkout-filter">
+            <option value="all">Все</option>
+            <option value="active">Активные</option>
+            <option value="returned">Возвращённые</option>
+          </select>
+        </div>
+        <div class="table-container">
+          <table class="table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Книга</th>
+                <th>Ученик</th>
+                <th>Выдан</th>
+                <th>Возвращён</th>
+                <th>Статус</th>
+                <th>Действия</th>
+              </tr>
+            </thead>
+            <tbody id="checkouts-tbody"></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Modal container -->
+  <div id="modal-overlay" class="modal-overlay hidden">
+    <div class="modal" id="modal-content"></div>
+  </div>
+
+  <!-- Toast container -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <script src="qrcode.js"></script>
+  <script src="jsqr.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
